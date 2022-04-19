@@ -1,7 +1,5 @@
 <?php
 
-    error_reporting(E_ERROR | E_PARSE);
-
     header('Access-Control-Allow-Origin: *');
     header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
     header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
@@ -905,253 +903,174 @@
 
         }
 
-        /** Módulo de cumplimientos de plazos */
-        public function reporte_cumplimiento_plazos_filtrado(){
-
-            /** Parametros */
-            $fecha_inicio = $this->validateParameter('fecha_inicio', $this->param['fecha_inicio'], STRING);
-            $fecha_fin = $this->validateParameter('fecha_fin', $this->param['fecha_fin'], STRING);
-
-            $ch = curl_init();
-
-            curl_setopt($ch, CURLOPT_URL,"https://udicat.muniguate.com/apps/calidad_sima_api/");
-            curl_setopt($ch, CURLOPT_POST, 1);
-
-            $data = array(
-                "name" => "reporte_cumplimiento_plazos_filtrado",
-                "param" => array(
-                    "fecha_inicio" => $fecha_inicio,
-                    "fecha_fin" => $fecha_fin
-                )
-            );
-
-            $payload = json_encode($data);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-
-            $server_output = curl_exec($ch);
-
-
-            // $fecha_reporte = $fecha_inicio . " - " . $fecha_fin;
-
-            // try {
-
-            //     $query = "  SELECT CONCAT(CONCAT(DOC.DOCUMENTO, ' - '), DOC.ANIO) AS DOCUMENTO, DOC.PRIMER_NOMBRE,
-            //                 DOC.PRIMER_APELLIDO, TO_CHAR(DOC.FECHA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA, TO_CHAR(DOC.FECHA, 'YYYY/MM/DD HH24:MI:SS') AS FECHA_CALCULO, TO_CHAR(DOC.FECHA, 'HH24:MI:SS') AS HORA_CALCULO, DOC.USUARIO, DOC.PLAZO_HORAS, TO_CHAR(DOC.FECHA_ENTREGA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA_ENTREGA, TO_CHAR(DOC.FECHA_ENTREGA, 'YYYY/MM/DD HH24:MI:SS') AS FECHA_ENTREGA_CALCULO
-            //                 FROM CDO_DOCUMENTO DOC
-            //                 INNER JOIN CDO_DETDOCUMENTO DET
-            //                 ON DOC.DOCUMENTO = DET.DOCUMENTO
-            //                 AND DOC.ANIO = DET.ANIO
-            //                 AND DOC.CODIGOCLASE = DET.CODIGOCLASE
-            //                 AND DOC.CODIGOCLASE = 3
-            //                 AND DET.CODTRAMITE = 192
-            //                 AND TO_DATE(DOC.FECHA, 'DD/MM/YYYY') BETWEEN TO_DATE('$fecha_inicio', 'DD/MM/YYYY') AND TO_DATE('$fecha_fin', 'DD/MM/YYYY')
-            //                 ORDER BY DOC.DOCUMENTO ASC";
-
-            //     $stid = oci_parse($this->dbConn, $query);
-
-            //     if (false === oci_execute($stid)) {
-
-            //         $err = oci_error($stid);
-
-			// 		$str_error = "No se pudo procesar la solicitud";
-
-            //         $this->throwError($err["code"], $str_error);
-
-            //     }
-
-            //     $lotes = array();
-
-            //     /** Contadores */
-            //     $en_tiempo = 0;
-            //     $en_proceso = 0;
-            //     $fuera_tiempo = 0;
-
-            //     while ($data = oci_fetch_array($stid,OCI_ASSOC)) {
-
-            //         $fecha_recibido = $data["FECHA_CALCULO"];
-            //         $hora_recibido = $data["HORA_CALCULO"];
-            //         $plazo = $data["PLAZO_HORAS"];
-
-            //         $horas_dias = intval($plazo) / 24;
-
-            //         $dias = intval($horas_dias);
-            //         $horas = ($horas_dias - $dias) * 24;
-
-            //         $now = new DateTime($fecha_recibido); 
-            //         $str_plazo = "+".$dias." weekday $hora_recibido";
-            //         $now->modify($str_plazo);
-                    
-            //         $str_plazo = "+" .$horas. " hours";
-            //         $now->modify($str_plazo);
-
-            //         $new_time = $now->format('d/m/Y H:i:s');
-            //         $calculo_fecha_limite = $now->format('Y/m/d H:i:s');
-
-            //         /*
-            //         $plazo = ceil(intval($plazo) / 24);
-            //         $str_plazo = "+".$plazo." weekday";
-
-            //         $now = new DateTime($fecha_recibido); //current date/time
-            //         $now->modify($str_plazo);
-            //         $new_time = $now->format('d/m/Y H:i:s');
-            //         $calculo_fecha_limite = $now->format('Y/m/d H:i:s');
-            //         */
-
-            //         /* Fecha actual */
-            //         $hoy = new DateTime();
-            //         $hoy = $hoy->format('Y/m/d');
-
-            //         /* La fecha de entrega debe ser menor o igual a la fecha limite */
-            //         /* Si existe fecha de entrega */
-            //         if (array_key_exists('FECHA_ENTREGA_CALCULO', $data)) {
-
-            //             if (strtotime($data["FECHA_ENTREGA_CALCULO"]) <= strtotime($calculo_fecha_limite)) {
-            //                 $data["CUMPLIMIENTO"] = 1;
-            //                 $en_tiempo++;
-            //             }else{
-            //                 $data["CUMPLIMIENTO"] = 0;
-            //                 $fuera_tiempo++;
-            //             }
-
-            //         }else{
-            //             $en_proceso++;
-            //         }
-
-            //         $data["FECHA_LIMITE"] = $new_time;
-            //         $fecha_entrega = $data["FECHA_ENTREGA_CALCULO"];
-            //         $lotes [] = $data;
-
-            //     }
-
-            //     $this->returnResponse(SUCCESS_RESPONSE, array($lotes, $fecha_reporte, $en_tiempo, $en_proceso, $fuera_tiempo, $fecha_entrega, $calculo_fecha_limite));
-
-            // } catch (\Throwable $th) {
-
-            //     $this->throwError(JWT_PROCESSING_ERROR, $e->getMessage());
-
-            // }
-
-        }
-
         public function reporte_cumplimiento_plazos(){
 
-            $ch = curl_init();
+            $first_day_this_month = $this->param['fecha_inicio'] ? $this->param['fecha_inicio'] : date('01/m/Y');
+            $last_day_this_month = $this->param['fecha_fin'] ? $this->param['fecha_fin'] : date('t/m/Y');
 
-            curl_setopt($ch, CURLOPT_URL,"https://udicat.muniguate.com/apps/calidad_sima_api/");
-            curl_setopt($ch, CURLOPT_POST, 1);
+            $month = date('m/Y');
 
-            $data = array(
-                "name" => "reporte_cumplimiento_plazos",
-                "param" => array()
-            );
+            $fecha_reporte = $first_day_this_month . " - " . $last_day_this_month;
 
-            $payload = json_encode($data);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+            try {
 
-            $server_output = curl_exec($ch);
+                $query = "  SELECT CONCAT(CONCAT(DOC.DOCUMENTO, ' - '), DOC.ANIO) AS DOCUMENTO, DOC.PRIMER_NOMBRE,
+                            DOC.PRIMER_APELLIDO, TO_CHAR(DOC.FECHA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA, TO_CHAR(DOC.FECHA, 'YYYY/MM/DD HH24:MI:SS') AS FECHA_CALCULO, TO_CHAR(DOC.FECHA, 'HH24:MI:SS') AS HORA_CALCULO, DOC.USUARIO, DOC.PLAZO_HORAS, TO_CHAR(DOC.FECHA_ENTREGA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA_ENTREGA, TO_CHAR(DOC.FECHA_ENTREGA, 'YYYY/MM/DD HH24:MI:SS') AS FECHA_ENTREGA_CALCULO
+                            FROM CDO_DOCUMENTO DOC
+                            INNER JOIN CDO_DETDOCUMENTO DET
+                            ON DOC.DOCUMENTO = DET.DOCUMENTO
+                            AND DOC.ANIO = DET.ANIO
+                            AND DOC.CODIGOCLASE = DET.CODIGOCLASE
+                            AND DOC.CODIGOCLASE = 3
+                            AND DET.CODTRAMITE = 192
+                            AND TO_DATE(DOC.FECHA, 'DD/MM/YYYY') BETWEEN TO_DATE('$first_day_this_month', 'DD/MM/YYYY') AND TO_DATE('$last_day_this_month', 'DD/MM/YYYY')
+                            ORDER BY DOC.DOCUMENTO ASC";
 
-            // $this->returnResponse(SUCCESS_RESPONSE, $server_output);
+                $stid = oci_parse($this->dbConn, $query);
 
+                if (false === oci_execute($stid)) {
 
-            // $first_day_this_month = date('01/m/Y');
-            // $last_day_this_month  = date('t/m/Y');
-            // $month = date('m/Y');
+                    $err = oci_error($stid);
 
-            // $fecha_reporte = $first_day_this_month . " - " . $last_day_this_month;
+					$str_error = "No se pudo procesar la solicitud";
 
-            // try {
+                    $this->throwError($err["code"], $str_error);
 
-            //     $query = "  SELECT CONCAT(CONCAT(DOC.DOCUMENTO, ' - '), DOC.ANIO) AS DOCUMENTO, DOC.PRIMER_NOMBRE,
-            //                 DOC.PRIMER_APELLIDO, TO_CHAR(DOC.FECHA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA, TO_CHAR(DOC.FECHA, 'YYYY/MM/DD HH24:MI:SS') AS FECHA_CALCULO, TO_CHAR(DOC.FECHA, 'HH24:MI:SS') AS HORA_CALCULO, DOC.USUARIO, DOC.PLAZO_HORAS, TO_CHAR(DOC.FECHA_ENTREGA, 'DD/MM/YYYY HH24:MI:SS') AS FECHA_ENTREGA, TO_CHAR(DOC.FECHA_ENTREGA, 'YYYY/MM/DD HH24:MI:SS') AS FECHA_ENTREGA_CALCULO
-            //                 FROM CDO_DOCUMENTO DOC
-            //                 INNER JOIN CDO_DETDOCUMENTO DET
-            //                 ON DOC.DOCUMENTO = DET.DOCUMENTO
-            //                 AND DOC.ANIO = DET.ANIO
-            //                 AND DOC.CODIGOCLASE = DET.CODIGOCLASE
-            //                 AND DOC.CODIGOCLASE = 3
-            //                 AND DET.CODTRAMITE = 192
-            //                 AND TO_CHAR(DOC.FECHA, 'MM/YYYY') = '$month'
-            //                 ORDER BY DOC.DOCUMENTO ASC";
+                }
 
-            //     $stid = oci_parse($this->dbConn, $query);
+                $lotes = array();
 
-            //     if (false === oci_execute($stid)) {
+                /** Contadores */
+                $en_tiempo = 0;
+                $en_proceso = 0;
+                $fuera_tiempo = 0;
 
-            //         $err = oci_error($stid);
+                // Obtener listado de días inhabiles 
+                $query = "  SELECT TO_CHAR(FECHA, 'YYYY/MM/DD') AS FECHA
+                            FROM CATASTRO.CDO_DIAS_INHABILES_SIMA
+                            ORDER BY FECHA ASC";
 
-			// 		$str_error = "No se pudo procesar la solicitud";
+                $stid_ = oci_parse($this->dbConn, $query);
 
-            //         $this->throwError($err["code"], $str_error);
+                oci_execute($stid_);
 
-            //     }
+                $dias_inhabiles = [];
 
-            //     $lotes = array();
-
-            //     /** Contadores */
-            //     $en_tiempo = 0;
-            //     $en_proceso = 0;
-            //     $fuera_tiempo = 0;
-
-            //     while ($data = oci_fetch_array($stid,OCI_ASSOC)) {
-
-            //         $fecha_recibido = $data["FECHA_CALCULO"];
-            //         $hora_recibido = $data["HORA_CALCULO"];
-            //         $plazo = $data["PLAZO_HORAS"];
-
-            //         $horas_dias = intval($plazo) / 24;
-
-            //         $dias = intval($horas_dias);
-            //         $horas = ($horas_dias - $dias) * 24;
-
-            //         $str_plazo = "+".$dias." weekday $hora_recibido";
-            //         $now = new DateTime($fecha_recibido); 
-            //         $now->modify($str_plazo);
+                while ($data = oci_fetch_array($stid_, OCI_ASSOC)) {
                     
-            //         $str_plazo = "+" .$horas. " hours";
-            //         $now->modify($str_plazo);
+                    $dias_inhabiles [] = strtotime($data["FECHA"]);
 
-            //         $new_time = $now->format('d/m/Y H:i:s');
+                }
 
-            //         //$new_time = date("d/m/Y H:i:s", strtotime('+5 hours', $now));
+                while ($data = oci_fetch_array($stid,OCI_ASSOC)) {
+                    
+                    $fecha_recibido = $data["FECHA_CALCULO"];
+                    $hora_recibido = $data["HORA_CALCULO"];
+                    $plazo = isset($data["PLAZO_HORAS"]) ? $data["PLAZO_HORAS"] : null;
+                    
+                    $horas_dias = intval($plazo) / 24;
 
-            //         $calculo_fecha_limite = $now->format('Y/m/d H:i:s');
+                    $dias = intval($horas_dias);
+                    $horas = ($horas_dias - $dias) * 24;
 
-            //         /* Fecha actual */
-            //         $hoy = new DateTime();
-            //         $hoy = $hoy->format('Y/m/d');
+                    $plazo = intval($plazo) / 24;
 
-            //         /* La fecha de entrega debe ser menor o igual a la fecha limite */
-            //         /* Si existe fecha de entrega */
-            //         if (array_key_exists('FECHA_ENTREGA_CALCULO', $data)) {
+                    $str_plazo = "+".$dias." weekday $hora_recibido";
+                    $now = new DateTime($fecha_recibido); 
+                    $now->modify($str_plazo);
+                    
+                    $str_plazo = "+" .$horas. " hours";
+                    $now->modify($str_plazo);
 
-            //             if (strtotime($data["FECHA_ENTREGA_CALCULO"]) <= strtotime($calculo_fecha_limite)) {
-            //                 $data["CUMPLIMIENTO"] = 1;
-            //                 $en_tiempo++;
-            //             }else{
-            //                 $data["CUMPLIMIENTO"] = 0;
-            //                 $fuera_tiempo++;
-            //             }
+                    $new_time = $now->format('d/m/Y H:i:s');
+                    $calculo_fecha_limite = $now->format('Y/m/d H:i:s');
+                    
+                    //Fecha de Recepción para calculo
+                    $recepcion = strtotime(date("Y/m/d",strtotime($data["FECHA_CALCULO"])));
+                    $str_recepcion = date("Y/m/d",strtotime($data["FECHA_CALCULO"]));
 
-            //         }else{
+                    //Fecha de entrega
+                    $entrega = strtotime(date("Y/m/d",strtotime($calculo_fecha_limite)));
+                    $str_entrega = date("Y/m/d",strtotime($calculo_fecha_limite));
 
-            //             $en_proceso++;
+                    // Valicación
+                    foreach ($dias_inhabiles as $dia) {
+                        
+                        if (array_key_exists('FECHA_ENTREGA_CALCULO', $data)) {
 
-            //         }
+                            if ($recepcion <= $dia && strtotime($data["FECHA_ENTREGA_CALCULO"]) >= $dia) {
+                            
+                                $data["SUMAR_DIA"] = true;
+        
+                                // Dividir la fecha limite
+                                $fecha_limite = explode(" ", $new_time);
+                                $fecha = explode("/", $fecha_limite[0]);
+        
+                                $fecha_limite_format = $fecha[2]. "/" . $fecha[1] . "/" . $fecha[0] . " " . $fecha_limite[1];
+        
+                                $data["FECHA_LIMITE_FORMAT"] = $fecha_limite_format;
+        
+                                $now = new DateTime($fecha_limite_format); 
+                                $str_plazo = "+1 weekday " . $fecha_limite[1];
+                                $now->modify($str_plazo);
+                                $new_time = $now->format('d/m/Y H:i:s');
+                                $calculo_fecha_limite = $now->format('Y/m/d H:i:s');
+                                
+                            }
 
-            //         $data["FECHA_LIMITE"] = $new_time;
-            //         $lotes [] = $data;
+                        }
 
-            //     }
+                    }
 
-            //     // $this->returnResponse(SUCCESS_RESPONSE, array($lotes, $fecha_reporte, $en_tiempo, $en_proceso, $fuera_tiempo, $first_day_this_month, $last_day_this_month));
+                    /* Fecha actual */
+                    $hoy = new DateTime();
+                    $hoy = $hoy->format('Y/m/d');
 
-            // } catch (\Throwable $e) {
+                    /* La fecha de entrega debe ser menor o igual a la fecha limite */
+                    /* Si existe fecha de entrega */
+                    if (array_key_exists('FECHA_ENTREGA_CALCULO', $data)) {
+                        
+                        if (strtotime($data["FECHA_ENTREGA_CALCULO"]) <= strtotime($calculo_fecha_limite)) {
 
-            //     $this->throwError(JWT_PROCESSING_ERROR, $e->getMessage());
+                            $data["CUMPLIMIENTO"] = 1;
+                            $en_tiempo++;
+                            
+                        }else{
 
-            // }
+                            if ($plazo) {
+                                
+                                $data["CUMPLIMIENTO"] = 0;
+                                $fuera_tiempo++;
+
+                            }else{
+                                
+                                 $en_tiempo++;
+                                
+                            }
+                            
+                        }
+
+                    }else{
+
+                        $en_proceso++;
+                        
+                        
+
+                    }
+
+                    $data["FECHA_LIMITE"] = $new_time;
+                    $lotes [] = $data;
+
+                }
+
+                $this->returnResponse(SUCCESS_RESPONSE, array($lotes, $fecha_reporte, $en_tiempo, $en_proceso, $fuera_tiempo, $first_day_this_month, $last_day_this_month));
+
+            } catch (\Throwable $e) {
+
+                $this->throwError(JWT_PROCESSING_ERROR, $e->getMessage());
+
+            }
+
 
         }
 
